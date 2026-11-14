@@ -3,8 +3,8 @@
   "tasks": [
     {
       "type": "npm",
-      "script": "compile",
-      "problemMatcher": "$tsc",
+      "script": "bundle",
+      "problemMatcher": "$esbuild",
       "group": { "kind": "build", "isDefault": true }
     }
   ]
