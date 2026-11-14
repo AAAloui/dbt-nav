@@ -1,0 +1,8 @@
+.vscode/**
+.github/**
+src/**
+out/test/**
+test-fixtures/**
+**/*.map
+**/tsconfig.json
+.gitignore
