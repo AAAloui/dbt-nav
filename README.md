@@ -70,6 +70,17 @@ Layout:
 - `src/render.ts`: hover markdown
 - `src/extension.ts`: VS Code wiring (project discovery, file watching, hover provider)
 
+## Publishing
+
+Releases are published by `.github/workflows/release.yml` when a `vX.Y.Z` tag matching `package.json` is pushed:
+
+1. Bump `version` in `package.json` and add a `CHANGELOG.md` entry.
+2. `git tag v0.1.1 && git push --tags`
+
+The workflow publishes to [Open VSX](https://open-vsx.org) (VSCodium, Cursor, Windsurf, ...) using the `OVSX_PAT` repository secret, and attaches the `.vsix` to a GitHub release.
+
+Visual Studio Marketplace publishing is currently disabled in the workflow.
+
 ## License
 
 MIT

@@ -30,10 +30,19 @@ jobs:
       - name: Package
         run: npx vsce package -o dbt-nav.vsix
 
-      - name: Publish to Visual Studio Marketplace
-        run: npx vsce publish --packagePath dbt-nav.vsix
+      # Visual Studio Marketplace publishing is paused: see README "Publishing".
+      # To re-enable, add a VSCE_PAT secret and restore:
+      #   - run: npx vsce publish --packagePath dbt-nav.vsix
+      #     env: { VSCE_PAT: ${{ secrets.VSCE_PAT }} }
+
+      - name: Create Open VSX namespace if missing
+        run: |
+          status="$(curl -s -o /dev/null -w '%{http_code}' https://open-vsx.org/api/aaaloui)"
+          if [ "$status" = "404" ]; then
+            npx ovsx create-namespace aaaloui
+          fi
         env:
-          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
 
       - name: Publish to Open VSX
         run: npx ovsx publish dbt-nav.vsix
