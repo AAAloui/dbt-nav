@@ -100,9 +100,14 @@ Releases are published by `.github/workflows/release.yml` when a `vX.Y.Z` tag ma
 1. Bump `version` in `package.json` and add a `CHANGELOG.md` entry.
 2. `git tag v0.1.1 && git push --tags`
 
-The workflow publishes to [Open VSX](https://open-vsx.org) (VSCodium, Cursor, Windsurf, ...) using the `OVSX_PAT` repository secret, and attaches the `.vsix` to a GitHub release.
+The workflow publishes to both stores and attaches the `.vsix` to a GitHub release:
 
-Visual Studio Marketplace publishing is currently disabled in the workflow.
+| Store | Used by | Repository secret |
+| --- | --- | --- |
+| [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=aaaloui.dbt-nav) | VS Code | `VSCE_PAT`: an Azure DevOps personal access token with the **Marketplace › Manage** scope, for the `aaaloui` publisher |
+| [Open VSX](https://open-vsx.org/extension/aaaloui/dbt-nav) | VSCodium, Cursor, Windsurf, ... | `OVSX_PAT` |
+
+If `VSCE_PAT` is not set, the Marketplace step is skipped with a warning and the `.vsix` can be uploaded by hand at https://marketplace.visualstudio.com/manage.
 
 ## License
 
