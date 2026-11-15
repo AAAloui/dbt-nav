@@ -10,6 +10,8 @@ export interface DbtNode {
   sourceName?: string;
   /** Absolute path of the file that defines the node, when known. */
   filePath?: string;
+  /** Column names documented in YAML (manifest only). */
+  columns?: string[];
   /** True for nodes referenced by a ref()/source() that could not be resolved. */
   missing?: boolean;
 }

@@ -28,6 +28,27 @@ Every entry links to its file, so you can click through the DAG.
 
 An ancestor reachable along several paths is expanded once; later sightings say *(see above)*.
 
+## Column lineage
+
+Hover over a column in a model's SQL to see where it comes from among the model's **direct** upstreams:
+
+- **Direct**: passed through (possibly renamed) from an upstream column.
+- **Transformation**: computed from one or more upstream columns, with the expression shown.
+
+```
+◇ full_name  column
+
+⚙ Transformation of 2 upstream columns:
+- ⛁ jaffle.raw_customers  source · first_name
+- ⛁ jaffle.raw_customers  source · last_name
+
+    first_name || ' ' || last_name
+```
+
+Columns are followed through CTEs, subqueries, joins, unions and `select *` until they reach a `ref()` or `source()`. Hover works on select-list columns and aliases, and on columns used in `on`, `where`, `group by`, `order by`, etc.
+
+When a column is unqualified in a join (or comes through a `select *` over a join), dbt-nav works out which upstream has it from the upstream model's SQL, a seed's CSV header, or columns documented in YAML (manifest mode). If it still can't tell, the hover lists every candidate. Columns produced by Jinja macros can't be traced.
+
 ## Where lineage comes from
 
 | `dbtNav.lineageSource` | Behaviour |
@@ -67,6 +88,8 @@ Layout:
 - `src/graph.ts`: the DAG, ref resolution, upstream tree and downstream list
 - `src/manifest.ts`: builds the graph from `manifest.json`
 - `src/scanner.ts`: builds the graph by scanning project files
+- `src/sql.ts`: a small, forgiving SQL parser (CTEs, select lists, from/join items)
+- `src/columns.ts`: column lineage: traces a column to the model's direct upstreams
 - `src/render.ts`: hover markdown
 - `src/extension.ts`: VS Code wiring (project discovery, file watching, hover provider)
 

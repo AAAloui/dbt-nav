@@ -1,3 +1,4 @@
+import { ColumnLineage, ColumnOrigin } from './columns';
 import { DbtNode, LineageGraph, UpstreamEntry, UpstreamOptions, displayName } from './graph';
 
 export interface RenderOptions extends UpstreamOptions {
@@ -18,6 +19,7 @@ const ICONS: Record<string, string> = {
   analysis: '$(notebook)',
   test: '$(beaker)',
   unit_test: '$(beaker)',
+  table: '$(table)',
 };
 
 /** Markdown (with codicons) for a hover: all ancestors as a tree, direct children as a flat list. */
@@ -48,6 +50,43 @@ export function renderLineage(graph: LineageGraph, node: DbtNode, opts: RenderOp
     for (const child of down) {
       lines.push(`- ${item(child, opts)}`);
     }
+  }
+  return lines.join('\n');
+}
+
+/** Markdown for a column hover: whether the column is passed through from a direct upstream or computed. */
+export function renderColumnLineage(col: ColumnLineage, opts: Pick<RenderOptions, 'linkFor'> = {}): string {
+  const lines = [`$(symbol-field) **${escape(col.column)}** \`column\``, ''];
+  const origin = (o: ColumnOrigin) => `${item(o.node, opts)} · \`${o.column.replace(/`/g, "'")}\``;
+  const list = () => col.origins.forEach((o) => lines.push(`- ${origin(o)}`));
+  const n = col.origins.length;
+
+  if (col.kind === 'direct') {
+    if (n === 0) {
+      lines.push('_Could not trace this column to an upstream._');
+    } else if (n === 1 && !col.ambiguous) {
+      lines.push(`$(arrow-up) **Direct** from ${origin(col.origins[0])}`);
+    } else {
+      lines.push(`$(arrow-up) **Direct** from ${col.ambiguous ? 'one of' : 'each of'}:`, '');
+      list();
+    }
+  } else {
+    if (n > 0) {
+      lines.push(`$(gear) **Transformation** of ${plural(n, 'upstream column')}:`, '');
+      list();
+    } else {
+      lines.push(`$(gear) **Transformation**${col.unresolved ? '' : ' — uses no upstream column'}`);
+    }
+    if (col.expression) {
+      const expr = col.expression.length > 400 ? `${col.expression.slice(0, 400)}…` : col.expression;
+      lines.push('', '```sql', expr.replace(/```/g, "'''"), '```');
+    }
+    if (col.ambiguous) {
+      lines.push('', '_Some columns could come from several upstreams._');
+    }
+  }
+  if (col.unresolved && n > 0) {
+    lines.push('', '_Part of the lineage could not be traced._');
   }
   return lines.join('\n');
 }

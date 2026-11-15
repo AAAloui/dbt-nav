@@ -1,11 +1,12 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from 'vscode';
-import { LineageGraph } from './graph';
+import { columnContext, columnLineageAt } from './columns';
+import { DbtNode, LineageGraph } from './graph';
 import { loadManifest } from './manifest';
 import { callAt } from './parse';
 import { DbtProjectConfig, readProjectConfig } from './project';
-import { renderLineage } from './render';
+import { renderColumnLineage, renderLineage } from './render';
 import { scanProject } from './scanner';
 
 const SELECTOR: vscode.DocumentSelector = [
@@ -125,8 +126,9 @@ class LineageHoverProvider implements vscode.HoverProvider {
 
   async provideHover(doc: vscode.TextDocument, pos: vscode.Position): Promise<vscode.Hover | undefined> {
     const text = doc.getText();
-    const call = callAt(text, doc.offsetAt(pos));
-    if (!call) {
+    const offset = doc.offsetAt(pos);
+    const call = callAt(text, offset);
+    if (!call && doc.languageId === 'python') {
       return undefined;
     }
     const project = await this.registry.forFile(doc.uri.fsPath);
@@ -134,8 +136,18 @@ class LineageHoverProvider implements vscode.HoverProvider {
     if (!graph) {
       return undefined;
     }
-
     const current = graph.nodeForFile(doc.uri.fsPath);
+    const linkFor = (n: DbtNode) => (n.filePath ? vscode.Uri.file(n.filePath).toString() : undefined);
+
+    if (!call) {
+      const col = columnLineageAt(text, offset, columnContext(graph, current?.packageName));
+      if (!col) {
+        return undefined;
+      }
+      const range = new vscode.Range(doc.positionAt(col.start), doc.positionAt(col.end));
+      return new vscode.Hover(new vscode.MarkdownString(renderColumnLineage(col, { linkFor }), true), range);
+    }
+
     const target =
       call.kind === 'ref'
         ? graph.resolveRef(call.name, call.packageName, current?.packageName)
@@ -155,7 +167,7 @@ class LineageHoverProvider implements vscode.HoverProvider {
         maxDepth: cfg.get<number>('upstream.maxDepth', 0),
         maxNodes: cfg.get<number>('upstream.maxNodes', 150),
         includeTests: cfg.get<boolean>('downstream.includeTests', false),
-        linkFor: (n) => (n.filePath ? vscode.Uri.file(n.filePath).toString() : undefined),
+        linkFor,
       }),
       true,
     );

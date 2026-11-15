@@ -1,8 +1,8 @@
 {
   "name": "dbt-nav",
   "displayName": "dbt-nav",
-  "description": "Hover over a dbt ref() to see the model's full upstream lineage and its direct downstream children.",
-  "version": "0.1.0",
+  "description": "Hover over a dbt ref() to see the model's full upstream lineage and direct downstream children, or over a column to see where it comes from.",
+  "version": "0.2.0",
   "publisher": "aaaloui",
   "license": "MIT",
   "icon": "images/icon.png",

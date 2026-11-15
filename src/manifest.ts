@@ -8,6 +8,7 @@ interface ManifestNode {
   package_name: string;
   original_file_path?: string;
   source_name?: string;
+  columns?: Record<string, { name?: string }>;
 }
 
 interface Manifest {
@@ -57,6 +58,7 @@ export function graphFromManifest(
   ];
   for (const group of groups) {
     for (const [id, n] of Object.entries(group ?? {})) {
+      const columns = Object.entries(n.columns ?? {}).map(([key, c]) => c?.name ?? key);
       graph.addNode({
         id,
         name: n.name,
@@ -64,6 +66,7 @@ export function graphFromManifest(
         packageName: n.package_name,
         sourceName: n.source_name,
         filePath: resolveFile(n.package_name, n.original_file_path),
+        columns: columns.length ? columns : undefined,
       });
     }
   }
