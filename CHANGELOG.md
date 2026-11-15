@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1
+
+- New icon colors to match the publisher logo.
+
 ## 0.2.0
 
 - Hover over a column to see whether it comes directly from an upstream column or is a transformation of upstream columns.
