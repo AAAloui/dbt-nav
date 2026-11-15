@@ -5,7 +5,8 @@ on:
     tags: ["v*"]
 
 permissions:
-  contents: write
+  contents: write # create the GitHub release
+  id-token: write # Visual Studio Marketplace trusted publishing (OIDC)
 
 jobs:
   publish:
@@ -44,15 +45,11 @@ jobs:
         env:
           OVSX_PAT: ${{ secrets.OVSX_PAT }}
 
+      # Trusted publishing: no secret needed. The Marketplace policy for the aaaloui
+      # publisher trusts AAAloui/dbt-nav's release.yml (no GitHub environment), so
+      # renaming this file or adding an `environment:` requires updating the policy.
       - name: Publish to Visual Studio Marketplace
-        run: |
-          if [ -z "$VSCE_PAT" ]; then
-            echo "::warning::VSCE_PAT secret is not set; skipping Visual Studio Marketplace. Upload dbt-nav.vsix manually."
-            exit 0
-          fi
-          npx vsce publish --packagePath dbt-nav.vsix
-        env:
-          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: npx vsce publish --oidc --packagePath dbt-nav.vsix
 
       - name: Attach .vsix to GitHub release
         run: gh release create "${GITHUB_REF_NAME}" dbt-nav.vsix --generate-notes

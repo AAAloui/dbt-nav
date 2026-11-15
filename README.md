@@ -102,12 +102,12 @@ Releases are published by `.github/workflows/release.yml` when a `vX.Y.Z` tag ma
 
 The workflow publishes to both stores and attaches the `.vsix` to a GitHub release:
 
-| Store | Used by | Repository secret |
+| Store | Used by | Authentication |
 | --- | --- | --- |
-| [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=aaaloui.dbt-nav) | VS Code | `VSCE_PAT`: an Azure DevOps personal access token with the **Marketplace › Manage** scope, for the `aaaloui` publisher |
-| [Open VSX](https://open-vsx.org/extension/aaaloui/dbt-nav) | VSCodium, Cursor, Windsurf, ... | `OVSX_PAT` |
+| [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=aaaloui.dbt-nav) | VS Code | [Trusted publishing](https://code.visualstudio.com/api/working-with-extensions/publishing-extension#publish-with-github-actions-and-trusted-publishing) (OIDC), no secret. The `aaaloui` publisher's policy trusts `AAAloui/dbt-nav`, workflow `release.yml`, no environment. |
+| [Open VSX](https://open-vsx.org/extension/aaaloui/dbt-nav) | VSCodium, Cursor, Windsurf, ... | `OVSX_PAT` repository secret |
 
-If `VSCE_PAT` is not set, the Marketplace step is skipped with a warning and the `.vsix` can be uploaded by hand at https://marketplace.visualstudio.com/manage.
+Renaming `release.yml` or running it in a GitHub environment breaks Marketplace publishing until the trusted publishing policy at https://marketplace.visualstudio.com/manage is updated to match.
 
 ## License
 
