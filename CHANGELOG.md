@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- `upstream.maxDepth` and `upstream.maxNodes` settings only accept whole numbers.
+
 ## 0.2.1
 
 - New icon colors to match the publisher logo.

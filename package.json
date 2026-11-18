@@ -69,13 +69,13 @@
           "description": "Path to manifest.json, relative to each dbt project root."
         },
         "dbtNav.upstream.maxDepth": {
-          "type": "number",
+          "type": "integer",
           "default": 0,
           "minimum": 0,
           "description": "Maximum number of upstream levels to display. 0 means unlimited (all ancestors)."
         },
         "dbtNav.upstream.maxNodes": {
-          "type": "number",
+          "type": "integer",
           "default": 150,
           "minimum": 1,
           "description": "Maximum number of upstream entries rendered in a hover, to keep huge DAGs readable."
