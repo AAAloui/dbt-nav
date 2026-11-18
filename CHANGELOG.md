@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Faster source lookups on large projects.
+
 ## 0.2.1
 
 - New icon colors to match the publisher logo.
