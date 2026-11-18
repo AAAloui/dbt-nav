@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Stop re-reading the project and repeating the log message on every hover when lineage can't be built.
+
 ## 0.2.1
 
 - New icon colors to match the publisher logo.

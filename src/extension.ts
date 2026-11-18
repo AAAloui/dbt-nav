@@ -22,6 +22,7 @@ let log: vscode.OutputChannel;
 /** One dbt project in the workspace, with a lazily (re)built lineage graph. */
 class DbtProject {
   private graph?: LineageGraph;
+  private built = false;
 
   constructor(readonly cfg: DbtProjectConfig) {}
 
@@ -31,10 +32,12 @@ class DbtProject {
 
   invalidate(): void {
     this.graph = undefined;
+    this.built = false;
   }
 
   getGraph(): LineageGraph | undefined {
-    if (!this.graph) {
+    if (!this.built) {
+      this.built = true;
       this.graph = this.build();
     }
     return this.graph;
