@@ -73,6 +73,7 @@ export class LineageGraph {
   private readonly childIds = new Map<string, Set<string>>();
   private readonly byPath = new Map<string, DbtNode>();
   private readonly byName = new Map<string, DbtNode[]>();
+  private readonly bySource = new Map<string, DbtNode>();
 
   constructor(
     /** Name of the root dbt project; refs from unknown files resolve against it first. */
@@ -88,6 +89,13 @@ export class LineageGraph {
       const same = this.byName.get(node.name) ?? [];
       same.push(node);
       this.byName.set(node.name, same);
+    }
+    if (node.resourceType === 'source' && node.sourceName) {
+      const key = sourceKey(node.sourceName, node.name);
+      const existing = this.bySource.get(key);
+      if (!existing || existing.id === node.id) {
+        this.bySource.set(key, node);
+      }
     }
   }
 
@@ -130,12 +138,7 @@ export class LineageGraph {
   }
 
   resolveSource(sourceName: string, table: string): DbtNode | undefined {
-    for (const n of this.nodes.values()) {
-      if (n.resourceType === 'source' && n.sourceName === sourceName && n.name === table) {
-        return n;
-      }
-    }
-    return undefined;
+    return this.bySource.get(sourceKey(sourceName, table));
   }
 
   /** Every ancestor of `id`, as a tree. Each ancestor is expanded once; later sightings are marked `repeated`. */
@@ -205,6 +208,10 @@ export class LineageGraph {
     }
     return out;
   }
+}
+
+function sourceKey(sourceName: string, table: string): string {
+  return `${sourceName}\u0000${table}`;
 }
 
 function getOrCreate<K, V>(map: Map<K, Set<V>>, key: K): Set<V> {

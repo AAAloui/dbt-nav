@@ -104,3 +104,22 @@ test('render: nested upstream, flat downstream, links', () => {
   assert.match(md, /Downstream\*\* — 1 direct child/);
   assert.match(md, /^- \$\(table\) \[fct\\_orders\]/m);
 });
+
+test('graph: resolveSource finds sources by source name and table', () => {
+  const g = new LineageGraph('proj');
+  const src = { id: 'source.proj.raw.orders', name: 'orders', resourceType: 'source', packageName: 'proj', sourceName: 'raw' };
+  g.addNode(src);
+  assert.equal(g.resolveSource('raw', 'orders'), src);
+  assert.equal(g.resolveSource('raw', 'missing'), undefined);
+  assert.equal(g.resolveSource('other', 'orders'), undefined);
+});
+
+test('graph: same table name under different sources resolves independently', () => {
+  const g = new LineageGraph('proj');
+  const a = { id: 'source.proj.a.orders', name: 'orders', resourceType: 'source', packageName: 'proj', sourceName: 'a' };
+  const b = { id: 'source.proj.b.orders', name: 'orders', resourceType: 'source', packageName: 'proj', sourceName: 'b' };
+  g.addNode(a);
+  g.addNode(b);
+  assert.equal(g.resolveSource('a', 'orders'), a);
+  assert.equal(g.resolveSource('b', 'orders'), b);
+});
