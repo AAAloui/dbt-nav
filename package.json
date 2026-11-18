@@ -37,6 +37,10 @@
     "onLanguage:sql",
     "onLanguage:jinja-sql"
   ],
+  "capabilities": {
+    "untrustedWorkspaces": { "supported": true },
+    "virtualWorkspaces": false
+  },
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
