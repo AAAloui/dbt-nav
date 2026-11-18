@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Works in Restricted Mode (untrusted workspaces).
+
 ## 0.2.1
 
 - New icon colors to match the publisher logo.
